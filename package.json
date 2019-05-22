@@ -1,0 +1,35 @@
+{
+  "name": "node_request_curl",
+  "version": "1.1.0",
+  "description": " NODE 请求转换为curl",
+  "main": "src/httpRecorder/httprecorder.js",
+  "dependencies": {
+    "request-to-curl": "^0.1.1"
+  },
+  "devDependencies": {
+    "cz-conventional-changelog": "^2.1.0",
+    "eslint": "^5.0.0",
+    "lint-staged": "^7.1.1"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .ts --fix",
+    "precommit": "lint-staged"
+  },
+  "author": "chenjingnan@jd.com",
+  "license": "Apache",
+  "engines": {
+    "node": ">= 8.6.0",
+    "npm": ">= 5.6.0"
+  },
+  "lint-staged": {
+    "*.{ts}": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
