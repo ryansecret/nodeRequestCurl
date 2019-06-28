@@ -2,7 +2,7 @@
 const http = require('http');
 const https = require('https');
 const NewReadable = require('./NewReadable');
-require('request-to-curl');
+require('../requestToCurl');
 module.exports = (callback = () => { }) => {
   http.__request__ = http.__request__ || http.request;
   http.request = getRequestProxy(http, callback);
