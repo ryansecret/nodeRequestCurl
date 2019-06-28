@@ -1,9 +1,10 @@
 {
   "name": "node_request_curl",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": " NODE 请求转换为curl",
   "main": "src/httpRecorder/httprecorder.js",
   "dependencies": {
+    "http-parser-js": "^0.5.0",
     "request-to-curl": "^0.1.1"
   },
   "devDependencies": {
