@@ -90,57 +90,62 @@ function escapeStringPosix(str) {
 }
 
 function toCurl(platform) {
+  try {
     platform = platform || (os.platform().startsWith('win') ? 'win' : 'posix');
 
     var command = ['curl'],
-        ignoredHeaders = ['host', 'method', 'path', 'scheme', 'version'],
-        escapeString = platform === 'win' ? escapeStringWindows : escapeStringPosix,
-        requestMethod = 'GET',
-        data = [],
-        requestHeaders = this._headers,
-        requestBody = parseRequestBody(this._requestBody).toString(),
-        contentType = requestHeaders['content-type'];
+      ignoredHeaders = ['host', 'method', 'path', 'scheme', 'version'],
+      escapeString = platform === 'win' ? escapeStringWindows : escapeStringPosix,
+      requestMethod = 'GET',
+      data = [],
+      requestHeaders = this._headers,
+      requestBody = parseRequestBody(this._requestBody).toString(),
+      contentType = requestHeaders['content-type'];
 
     command.push(escapeString(url.format({
-            protocol: this.agent.protocol,
-            port: this.agent.port,
-            host: requestHeaders.host
-        }) + this.path).replace(/[[{}\]]/g, "\\$&")
+        protocol: this.agent.protocol,
+        port: this.agent.port,
+        host: requestHeaders.host
+      }) + this.path).replace(/[[{}\]]/g, "\\$&")
     );
 
     if (requestBody !== '') {
-        ignoredHeaders.push('content-length');
-        requestMethod = 'POST';
+      ignoredHeaders.push('content-length');
+      requestMethod = 'POST';
 
-        if (contentType && contentType.startsWith('application/x-www-form-urlencoded')) {
-            data.push('--data');
-        } else {
-            data.push('--data-binary');
-        }
+      if (contentType && contentType.startsWith('application/x-www-form-urlencoded')) {
+        data.push('--data');
+      } else {
+        data.push('--data-binary');
+      }
 
-        data.push(escapeString(requestBody));
+      data.push(escapeString(requestBody));
     }
 
     if (this.method !== requestMethod) {
-        command.push('-X');
-        command.push(this.method);
+      command.push('-X');
+      command.push(this.method);
     }
 
     Object.keys(requestHeaders)
-          .filter(name => ignoredHeaders.indexOf(name) === -1)
-          .forEach(function (name) {
-               command.push('-H');
-               command.push(escapeString(name.replace(/^:/, '') + ': ' + requestHeaders[name]));
-           });
+      .filter(name => ignoredHeaders.indexOf(name) === -1)
+      .forEach(function (name) {
+        command.push('-H');
+        command.push(escapeString(name.replace(/^:/, '') + ': ' + requestHeaders[name]));
+      });
 
     command = command.concat(data);
     command.push('--compressed');
 
     if (process.env.NODE_TLS_REJECT_UNAUTHORIZED == '0') {
-        command.push('--insecure');
+      command.push('--insecure');
     }
 
     return command.join(' ');
+  }
+  catch (e){
+    return e.message
+  }
 }
 
 http.ClientRequest.prototype._onSocket = http.ClientRequest.prototype.onSocket;
