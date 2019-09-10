@@ -112,7 +112,8 @@ function toCurl(platform) {
     if (requestBody !== '') {
       ignoredHeaders.push('content-length');
       requestMethod = 'POST';
-
+      if(Array.isArray(contentType))
+        contentType=contentType[0]
       if (contentType && contentType.startsWith('application/x-www-form-urlencoded')) {
         data.push('--data');
       } else {
