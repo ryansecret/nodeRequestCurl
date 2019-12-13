@@ -109,7 +109,7 @@ function toCurl(platform) {
       }) + this.path).replace(/[[{}\]]/g, "\\$&")
     );
 
-    if (requestBody !== '') {
+    if (requestBody !== ''&&requestBody.length<2048) {
       ignoredHeaders.push('content-length');
       requestMethod = 'POST';
       if(Array.isArray(contentType))
