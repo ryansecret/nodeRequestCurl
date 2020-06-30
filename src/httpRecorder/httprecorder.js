@@ -28,7 +28,7 @@ module.exports = (callback = () => { }) => {
             body += chunk;
           });
           resProxy.on('end', () => {
-            if(body.length>1024)
+            if(body.length>1024*3)
               body='the response is too large'
             out.response = statusLineAndHeaders + '\n\n' + body;
             out.request = req.toCurl();
