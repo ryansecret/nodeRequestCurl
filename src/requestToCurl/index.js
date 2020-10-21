@@ -1,42 +1,13 @@
 'use strict';
 
-var os = require('os'),
-    http = require('http'),
-    url = require('url'),
-    HTTPParser = process.binding('http_parser').HTTPParser=  require('http-parser-js').HTTPParser
-
-/*
- * Copyright (C) 2007, 2008 Apple Inc.  All rights reserved.
- * Copyright (C) 2008, 2009 Anthony Ricaud <rik@webkit.org>
- * Copyright (C) 2011 Google Inc. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1.  Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- * 2.  Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- * 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
- *     its contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY APPLE AND ITS CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL APPLE OR ITS CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+const os = require('os')
+const http = require('http')
+const url = require('url')
+const HTTPParser = process.binding('http_parser').HTTPParser=  require('http-parser-js').HTTPParser
+const {lengthLimit}=require('../const')
 
 function parseRequestBody(request) {
-    var parser = new HTTPParser(HTTPParser.REQUEST);
+    let parser = new HTTPParser(HTTPParser.REQUEST);
 
     parser.body = '';
     parser.bodyStart = 0;
@@ -67,7 +38,7 @@ function escapeStringWindows(str) {
 
 function escapeStringPosix(str) {
     function escapeCharacter(x) {
-        var code = x.charCodeAt(0);
+        let code = x.charCodeAt(0);
         if (code < 256) {
             // Add leading zero when needed to not care about the next character.
             return code < 16 ? "\\x0" + code.toString(16) : "\\x" + code.toString(16);
@@ -93,7 +64,7 @@ function toCurl(platform) {
   try {
     platform = platform || (os.platform().startsWith('win') ? 'win' : 'posix');
 
-    var command = ['curl'],
+    let command = ['curl'],
       ignoredHeaders = ['host', 'method', 'path', 'scheme', 'version'],
       escapeString = platform === 'win' ? escapeStringWindows : escapeStringPosix,
       requestMethod = 'GET',
@@ -109,7 +80,7 @@ function toCurl(platform) {
       }) + this.path).replace(/[[{}\]]/g, "\\$&")
     );
 
-    if (requestBody !== ''&&requestBody.length<2048) {
+    if (requestBody !== ''&&requestBody.length<lengthLimit) {
       ignoredHeaders.push('content-length');
       requestMethod = 'POST';
       if(Array.isArray(contentType))
@@ -152,7 +123,7 @@ function toCurl(platform) {
 http.ClientRequest.prototype._onSocket = http.ClientRequest.prototype.onSocket;
 
 http.ClientRequest.prototype.onSocket = function onSocket(socket) {
-    var self = this,
+    let self = this,
         ondata = socket.ondata,
         write = socket.write;
 
@@ -176,3 +147,6 @@ http.ClientRequest.prototype.onSocket = function onSocket(socket) {
 };
 
 http.ClientRequest.prototype.toCurl = toCurl;
+
+
+

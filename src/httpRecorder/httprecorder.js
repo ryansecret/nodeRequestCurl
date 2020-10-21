@@ -2,6 +2,7 @@
 const http = require('http');
 const https = require('https');
 const NewReadable = require('./NewReadable');
+const {lengthLimit}=require('../const')
 require('../requestToCurl');
 module.exports = (callback = () => { }) => {
   http.__request__ = http.__request__ || http.request;
@@ -16,6 +17,7 @@ module.exports = (callback = () => { }) => {
         error: '',
         time: new Date(),
       };
+
       const req = httpOrHttps.__request__(
         options,
         res => {
@@ -28,7 +30,7 @@ module.exports = (callback = () => { }) => {
             body += chunk;
           });
           resProxy.on('end', () => {
-            if(body.length>1024*3)
+            if(body.length>lengthLimit)
               body='the response is too large'
             out.response = statusLineAndHeaders + '\n\n' + body;
             out.request = req.toCurl();
@@ -49,11 +51,11 @@ module.exports = (callback = () => { }) => {
   }
 };
 
-function getStatusLineAndHeaders(res) {
+function getStatusLineAndHeaders(ctx) {
   const s = [];
-  const protocol = res.req.agent.protocol.replace(':', '').toUpperCase();
-  s.push(`${protocol}/${res.httpVersion} ${res.statusCode} ${res.statusMessage}`);
-  const headers = res.headers;
+  const protocol = ctx.req.agent.protocol.replace(':', '').toUpperCase();
+  s.push(`${protocol}/${ctx.httpVersion} ${ctx.statusCode} ${ctx.statusMessage}`);
+  const headers = ctx.headers;
   for (const k in headers) {
     s.push(`${k}: ${headers[k] || ''}`);
   }

@@ -1,14 +1,14 @@
 'use strict';
-const Readable = require('stream').Readable;
+const {Readable} = require('stream');
 
 class NewReadable extends Readable {
   constructor(originReadable) {
     super();
     this.originReadable = originReadable;
-    this.start();
+    this._init();
   }
 
-  start() {
+  _init() {
     this.originReadable.on('data', chunck => {
       this.push(chunck);
     });
